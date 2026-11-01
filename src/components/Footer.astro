@@ -1,0 +1,60 @@
+---
+import { site, repoUrl, releasesUrl, issuesUrl, fdroidUrl } from '../config';
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div>
+      <div class="brand">
+        <img src="/logo.svg" alt="" width="24" height="24" />
+        <strong>{site.name}</strong>
+      </div>
+      <p class="muted">{site.tagline}</p>
+    </div>
+    <nav aria-label="Footer">
+      <a href={repoUrl} target="_blank" rel="noopener">Source code</a>
+      <a href={releasesUrl} target="_blank" rel="noopener">GitHub releases</a>
+      <a href={fdroidUrl} target="_blank" rel="noopener">F-Droid</a>
+      <a href={issuesUrl} target="_blank" rel="noopener">Report an issue</a>
+    </nav>
+  </div>
+  <div class="container copyright muted">
+    © {year} VibeStudio contributors. Built with Astro. Powered by Termux &amp; proot.
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 3rem 0 2rem;
+    margin-top: 4rem;
+  }
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+  }
+  nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  nav a {
+    color: var(--text-muted);
+  }
+  nav a:hover {
+    color: var(--text);
+  }
+  .copyright {
+    margin-top: 2rem;
+    font-size: 0.85rem;
+  }
+</style>

@@ -1,0 +1,93 @@
+---
+const features = [
+  {
+    icon: '🤖',
+    title: 'Agentic AI chat',
+    text: 'Chat with local or remote models that can read, edit and run your code. Every change is tracked with one-click Keep / Undo.',
+  },
+  {
+    icon: '🧠',
+    title: 'Models management',
+    text: 'Configure, monitor and switch between model providers. Local-first — remote providers are optional and user-chosen.',
+  },
+  {
+    icon: '🔌',
+    title: 'MCP integration',
+    text: 'Connect Model Context Protocol tool servers and expose workspace skills to your agents.',
+  },
+  {
+    icon: '⌨️',
+    title: 'Built-in terminal',
+    text: 'A real Linux-like shell powered by Termux. Install packages, run build tools, keep servers alive in the background.',
+  },
+  {
+    icon: '🌿',
+    title: 'Git, built in',
+    text: 'Status, branches, staging, stash, commit history, in-editor diffs with hunk accept/revert and a visual conflict editor.',
+  },
+  {
+    icon: '🌐',
+    title: 'Agentic browser',
+    text: 'Test your work and automate the web through a built-in WebView driven by Chrome DevTools Protocol and a dedicated MCP server.',
+  },
+  {
+    icon: '📝',
+    title: 'Code editor',
+    text: 'TextMate syntax highlighting, word wrap, diff overlays and a log viewer with filtering, search and export.',
+  },
+  {
+    icon: '🛡️',
+    title: 'Permissions & workspace guard',
+    text: 'Granular control over system permissions, plus workspace boundary scoping so agents only touch what you allow.',
+  },
+];
+---
+
+<section id="features" class="section">
+  <div class="container">
+    <div class="section-head">
+      <span class="badge badge-teal">Features</span>
+      <h2>Everything you need to ship from your pocket</h2>
+      <p>A self-contained development environment — editor, terminal, Git, AI and browser — in one native app.</p>
+    </div>
+    <div class="grid">
+      {
+        features.map((f) => (
+          <article class="card feature">
+            <div class="icon" aria-hidden="true">
+              {f.icon}
+            </div>
+            <h3>{f.title}</h3>
+            <p class="muted">{f.text}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.25rem;
+  }
+  .feature h3 {
+    font-size: 1.1rem;
+    margin: 0.75rem 0 0.4rem;
+  }
+  .feature p {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+  .icon {
+    font-size: 1.6rem;
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+  }
+</style>

@@ -1,0 +1,65 @@
+---
+import { repoUrl } from '../config';
+---
+
+<section id="build" class="section build">
+  <div class="container">
+    <div class="section-head">
+      <span class="badge badge-purple">Hack on it</span>
+      <h2>Build from source</h2>
+      <p>
+        VibeStudio can be built in Android Studio, VS Code with Gradle, or straight from Termux on the phone
+        itself using the standalone <code>build.sh</code>.
+      </p>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <h3>1. Clone with submodules</h3>
+        <p class="muted">The terminal core (<code>libtermux-android</code>) lives in a git submodule.</p>
+        <pre><code>git clone --recursive {repoUrl}.git
+cd {repoUrl.split('/').pop()}</code></pre>
+      </div>
+      <div class="step">
+        <h3>2. Install the toolchain (Termux)</h3>
+        <p class="muted">One-time setup — installs JDK, Kotlin, aapt2, d8 and friends.</p>
+        <pre><code>./install_dependencies_termux.sh</code></pre>
+      </div>
+      <div class="step">
+        <h3>3. Build the APK</h3>
+        <p class="muted">Compiles, dexes, aligns and signs. Output lands in <code>bin/VibeStudio.apk</code>.</p>
+        <pre><code>./build.sh</code></pre>
+      </div>
+    </div>
+
+    <p class="more muted">
+      Prefer a desktop? Open the project in Android Studio or run <code>./gradlew :app:assembleDebug</code>. See the
+      <a href={`${repoUrl}#building--development`} target="_blank" rel="noopener">README</a> for VS Code tasks, adb
+      setup and debugging tips.
+    </p>
+  </div>
+</section>
+
+<style>
+  .build {
+    background: var(--bg-elev);
+    border-top: 1px solid var(--border);
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  .step h3 {
+    font-size: 1.05rem;
+    margin-bottom: 0.3rem;
+  }
+  .step p {
+    font-size: 0.92rem;
+    margin-bottom: 0.75rem;
+  }
+  .more {
+    margin-top: 2rem;
+    font-size: 0.95rem;
+  }
+</style>

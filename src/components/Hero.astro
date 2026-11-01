@@ -1,0 +1,106 @@
+---
+import { site, repoUrl } from '../config';
+import type { Release } from '../lib/releases';
+
+interface Props {
+  latest: Release | null;
+}
+const { latest } = Astro.props;
+const apk = latest?.assets[0];
+---
+
+<section class="hero">
+  <div class="container hero-inner">
+    <div class="hero-copy">
+      <span class="badge badge-purple">Early access · {latest ? latest.tag : 'v0.1.x'}</span>
+      <h1>
+        A full IDE on your phone.<br />
+        <span class="accent">Nothing leaves the device.</span>
+      </h1>
+      <p class="lead">
+        VibeStudio is a native Android IDE with a built-in terminal, Git, an agentic AI chat and a
+        browser with MCP tooling — running entirely on-device. Think <em>VS Code, but mobile</em>.
+      </p>
+      <div class="cta">
+        <a href={apk ? apk.url : '/downloads'} class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+          </svg>
+          Download APK
+        </a>
+        <a href="/downloads" class="btn btn-secondary">All downloads &amp; F-Droid</a>
+        <a href={repoUrl} class="btn btn-ghost" target="_blank" rel="noopener">View on GitHub</a>
+      </div>
+      <p class="meta muted">
+        Requires {site.minAndroid} · {site.arch} · Free &amp; open source
+      </p>
+    </div>
+    <div class="hero-media">
+      <div class="phone">
+        <img src="/images/demo.gif" alt="VibeStudio IDE demo: editing, terminal and AI chat on a phone" loading="eager" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding: 5rem 0 3rem;
+    background:
+      radial-gradient(60% 50% at 20% 0%, var(--teal-dim), transparent 70%),
+      radial-gradient(50% 50% at 90% 20%, var(--purple-dim), transparent 70%);
+  }
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 3rem;
+    align-items: center;
+  }
+  h1 {
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    margin: 1rem 0;
+  }
+  .accent {
+    background: linear-gradient(90deg, var(--teal), var(--purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .lead {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    max-width: 560px;
+  }
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 1.75rem 0 1rem;
+  }
+  .meta {
+    font-size: 0.9rem;
+  }
+  .phone {
+    border-radius: 28px;
+    border: 1px solid var(--border);
+    background: var(--bg-elev);
+    padding: 10px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+    max-width: 320px;
+    margin: 0 auto;
+  }
+  .phone img {
+    border-radius: 20px;
+  }
+  @media (max-width: 860px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+    }
+    .hero-media {
+      order: -1;
+    }
+    .phone {
+      max-width: 260px;
+    }
+  }
+</style>

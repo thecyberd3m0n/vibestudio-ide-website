@@ -1,0 +1,117 @@
+---
+import Base from '../layouts/Base.astro';
+import Download from '../components/Download.astro';
+import { getReleases, getLatestRelease, formatSize, formatDate } from '../lib/releases';
+import { releasesUrl } from '../config';
+
+const releases = await getReleases();
+const latest = await getLatestRelease();
+const older = releases.filter((r) => r.tag !== latest?.tag);
+---
+
+<Base title="Downloads" description="Download VibeStudio IDE for Android — latest APK, previous releases and F-Droid.">
+  <Download latest={latest} />
+
+  <section class="section history">
+    <div class="container">
+      <div class="section-head">
+        <h2>Previous releases</h2>
+        <p>
+          Release notes and APKs for earlier versions. The full list, including source archives, is on{' '}
+          <a href={releasesUrl} target="_blank" rel="noopener">GitHub</a>.
+        </p>
+      </div>
+
+      {
+        older.length === 0 ? (
+          <p class="muted">
+            {releases.length === 0
+              ? 'Release information could not be loaded at build time. Please use the GitHub releases page.'
+              : 'No earlier releases yet.'}
+          </p>
+        ) : (
+          <ul class="releases">
+            {older.map((r) => (
+              <li class="card release">
+                <div class="release-head">
+                  <h3>
+                    <a href={r.url} target="_blank" rel="noopener">
+                      {r.tag}
+                    </a>
+                    {r.prerelease && <span class="badge badge-muted">pre-release</span>}
+                  </h3>
+                  <time class="muted" datetime={r.publishedAt}>
+                    {formatDate(r.publishedAt)}
+                  </time>
+                </div>
+                {r.bodyHtml && <div class="muted notes" set:html={r.bodyHtml} />}
+                <div class="assets">
+                  {r.assets.map((a) => (
+                    <a href={a.url} class="btn btn-ghost">
+                      {a.name} <span class="muted">· {formatSize(a.size)}</span>
+                    </a>
+                  ))}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+  </section>
+</Base>
+
+<style>
+  .history {
+    padding-top: 0;
+  }
+  .releases {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 1rem;
+  }
+  .release-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .release h3 {
+    font-family: var(--mono);
+    font-size: 1.05rem;
+    margin: 0;
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+  }
+  .notes {
+    margin: 0.5rem 0 0.75rem;
+    font-size: 0.95rem;
+  }
+  .notes :global(h1),
+  .notes :global(h2),
+  .notes :global(h3) {
+    font-size: 1rem;
+    color: var(--text);
+    margin: 0.75rem 0 0.25rem;
+  }
+  .notes :global(ul) {
+    padding-left: 1.25rem;
+    margin: 0.25rem 0;
+  }
+  .notes :global(p) {
+    margin: 0.25rem 0;
+  }
+  .assets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .assets .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+</style>

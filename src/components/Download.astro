@@ -1,0 +1,151 @@
+---
+import { site, fdroidUrl, releasesUrl } from '../config';
+import { formatSize, formatDate } from '../lib/releases';
+import type { Release } from '../lib/releases';
+
+interface Props {
+  latest: Release | null;
+  /** Render the compact variant used on the landing page. */
+  compact?: boolean;
+}
+const { latest, compact = false } = Astro.props;
+const apk = latest?.assets[0];
+---
+
+<section id="download" class="section">
+  <div class="container">
+    <div class="section-head">
+      <span class="badge badge-teal">Get it</span>
+      <h2>Download VibeStudio</h2>
+      <p>
+        Free and open source. Requires {site.minAndroid} on an {site.arch} device.
+        {compact && <> <a href="/downloads">See all releases →</a></>}
+      </p>
+    </div>
+
+    <div class="options">
+      <article class="card option primary">
+        <div class="option-head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M5 16 3 7l5.5 4L12 4l3.5 7L21 7l-2 9H5Zm0 2h14v2H5z" />
+          </svg>
+          <h3>Direct APK</h3>
+        </div>
+        {
+          apk && latest ? (
+            <>
+              <p class="muted">
+                <strong class="ver">{latest.tag}</strong> · {formatSize(apk.size)} · released {formatDate(latest.publishedAt)}
+              </p>
+              {latest.bodyHtml && !compact && <div class="notes" set:html={latest.bodyHtml} />}
+              <a href={apk.url} class="btn btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+                </svg>
+                Download {apk.name}
+              </a>
+            </>
+          ) : (
+            <>
+              <p class="muted">Grab the latest signed APK from the GitHub releases page.</p>
+              <a href={releasesUrl} class="btn btn-primary" target="_blank" rel="noopener">
+                Open GitHub releases
+              </a>
+            </>
+          )
+        }
+        <p class="hint muted">
+          Signed with the project debug key during early access — you'll need to allow installs from unknown
+          sources.
+        </p>
+      </article>
+
+      <article class="card option">
+        <div class="option-head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M8 10h8M8 14h8M12 3v18" />
+          </svg>
+          <h3>F-Droid</h3>
+          {!site.fdroidPublished && <span class="badge badge-muted">coming soon</span>}
+        </div>
+        <p class="muted">
+          {
+            site.fdroidPublished
+              ? 'Install from the F-Droid catalogue to get reproducible builds and automatic updates.'
+              : 'F-Droid publication is in progress. Once merged, you will be able to install and auto-update from the F-Droid client.'
+          }
+        </p>
+        <a href={fdroidUrl} class="btn btn-secondary" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2 9.5 5.5h5L12 2Zm-6 5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H6Zm3 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
+          </svg>
+          Get it on F-Droid
+        </a>
+        <p class="hint muted">Package ID: <code>{site.packageId}</code></p>
+      </article>
+
+      <article class="card option">
+        <div class="option-head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="m8 9-4 3 4 3m8-6 4 3-4 3M14 5l-4 14" />
+          </svg>
+          <h3>Build from source</h3>
+        </div>
+        <p class="muted">
+          Build the APK yourself — even from inside Termux on your phone. No Android Studio required.
+        </p>
+        <a href="/#build" class="btn btn-ghost">Build instructions</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<style>
+  .options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+  .option {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .option.primary {
+    border-color: rgba(30, 207, 186, 0.4);
+    background: linear-gradient(180deg, var(--teal-dim), var(--bg-card) 60%);
+  }
+  .option-head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+  .option-head svg {
+    width: 28px;
+    height: 28px;
+    color: var(--teal);
+  }
+  .option h3 {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+  .option p {
+    margin: 0;
+  }
+  .ver {
+    color: var(--text);
+    font-family: var(--mono);
+  }
+  .notes {
+    font-size: 0.95rem;
+  }
+  .hint {
+    font-size: 0.82rem;
+    margin-top: auto;
+  }
+  .btn {
+    align-self: flex-start;
+  }
+</style>

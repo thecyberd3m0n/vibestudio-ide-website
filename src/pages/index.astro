@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import Features from '../components/Features.astro';
+import Principles from '../components/Principles.astro';
+import Download from '../components/Download.astro';
+import BuildFromSource from '../components/BuildFromSource.astro';
+import { getLatestRelease } from '../lib/releases';
+
+const latest = await getLatestRelease();
+---
+
+<Base>
+  <Hero latest={latest} />
+  <Features />
+  <Principles />
+  <Download latest={latest} compact />
+  <BuildFromSource />
+</Base>

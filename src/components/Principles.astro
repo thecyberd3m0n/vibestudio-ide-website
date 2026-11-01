@@ -1,0 +1,80 @@
+---
+const principles = [
+  {
+    title: 'No remote execution',
+    text: 'Your code and builds run only on the device. Nothing compiles, runs or is analyzed on our servers — ever.',
+  },
+  {
+    title: 'No hidden costs or dependencies',
+    text: 'No mandatory cloud service, no per-use metering, no silent third-party backend required for core functionality.',
+  },
+  {
+    title: 'Offline-capable by default',
+    text: 'Editing, building and running work with the network off. Model providers are optional and chosen by you.',
+  },
+  {
+    title: 'It must feel like a local IDE',
+    text: 'The runtime (proot on F-Droid, an on-device VM on Play) is an implementation detail you never have to think about.',
+  },
+];
+---
+
+<section id="principles" class="section principles">
+  <div class="container">
+    <div class="section-head">
+      <span class="badge badge-purple">Non-negotiables</span>
+      <h2>Replace a PC IDE on your phone — without ever sending your work to a remote server</h2>
+      <p>
+        Remote-dev tools are a non-starter for proprietary code, compliance rules and developers who won't pay a
+        recurring bill for what their phone can already run. Every architecture decision is checked against these
+        principles.
+      </p>
+    </div>
+    <ol class="list">
+      {
+        principles.map((p, i) => (
+          <li>
+            <span class="num">{String(i + 1).padStart(2, '0')}</span>
+            <div>
+              <h3>{p.title}</h3>
+              <p class="muted">{p.text}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .principles {
+    background: var(--bg-elev);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem 2.5rem;
+  }
+  li {
+    display: flex;
+    gap: 1rem;
+  }
+  .num {
+    font-family: var(--mono);
+    color: var(--purple);
+    font-weight: 700;
+    padding-top: 0.2rem;
+  }
+  h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.3rem;
+  }
+  li p {
+    margin: 0;
+  }
+</style>
