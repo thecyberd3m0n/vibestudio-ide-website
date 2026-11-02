@@ -28,20 +28,62 @@ const apk = latest?.assets[0];
           </svg>
           Download APK
         </a>
-        <a href="/downloads" class="btn btn-secondary">All downloads &amp; F-Droid</a>
+        <a href="/downloads" class="btn btn-secondary">Soon on F-Droid</a>
         <a href={repoUrl} class="btn btn-ghost" target="_blank" rel="noopener">View on GitHub</a>
       </div>
       <p class="meta muted">
         Requires {site.minAndroid} · {site.arch} · Free &amp; open source
       </p>
     </div>
-    <div class="hero-media">
-      <div class="phone">
-        <img src="/images/demo.gif" alt="VibeStudio IDE demo: editing, terminal and AI chat on a phone" loading="eager" />
+
+    <div
+      class="hero-media"
+      data-phone-stage
+      role="img"
+      aria-label="VibeStudio IDE demo on a phone: coding with an AI agent, terminal and Git"
+    >
+      <canvas class="phone-canvas"></canvas>
+      <!-- Screen recording shown on the 3D phone's display; also the fallback when WebGL is unavailable -->
+      <div class="phone-fallback">
+        <video class="phone-video" autoplay muted loop playsinline preload="auto" disablepictureinpicture>
+          <source src="/video/phone-demo.mp4" type="video/mp4" />
+        </video>
       </div>
     </div>
   </div>
 </section>
+
+<script>
+  import { createPhoneScene } from '../scripts/phone-scene';
+
+  const stage = document.querySelector<HTMLElement>('[data-phone-stage]');
+  const canvas = stage?.querySelector<HTMLCanvasElement>('.phone-canvas');
+  const video = stage?.querySelector<HTMLVideoElement>('.phone-video');
+
+  if (stage && canvas && video) {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const showFallback = () => stage.classList.add('is-fallback');
+
+    const probe = document.createElement('canvas');
+    const webgl = probe.getContext('webgl2') ?? probe.getContext('webgl');
+    if (!webgl) {
+      showFallback();
+    } else {
+      createPhoneScene({
+        stage,
+        canvas,
+        video,
+        modelUrl: '/models/smartphone.glb',
+        reducedMotion,
+        onReady: () => stage.classList.add('is-ready'),
+        onError: (error) => {
+          console.error('[hero] phone scene failed, using video fallback', error);
+          showFallback();
+        },
+      });
+    }
+  }
+</script>
 
 <style>
   .hero {
@@ -52,8 +94,8 @@ const apk = latest?.assets[0];
   }
   .hero-inner {
     display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
-    gap: 3rem;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 2.5rem;
     align-items: center;
   }
   h1 {
@@ -80,27 +122,76 @@ const apk = latest?.assets[0];
   .meta {
     font-size: 0.9rem;
   }
-  .phone {
-    border-radius: 28px;
-    border: 1px solid var(--border);
-    background: var(--bg-elev);
-    padding: 10px;
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
-    max-width: 320px;
+
+  .hero-media {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    aspect-ratio: 4 / 5;
     margin: 0 auto;
+    background: radial-gradient(ellipse at 50% 50%, rgba(32, 201, 177, 0.22) 0%, rgba(13, 13, 15, 0) 55%);
   }
-  .phone img {
-    border-radius: 20px;
+  .phone-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.6s ease;
   }
+  .hero-media.is-ready .phone-canvas {
+    opacity: 1;
+  }
+  /* The video stays in the DOM (it feeds the WebGL texture) but is only shown as a fallback */
+  .phone-fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .phone-video {
+    width: 1px;
+    height: 1px;
+    display: block;
+  }
+  .hero-media.is-fallback .phone-canvas {
+    display: none;
+  }
+  .hero-media.is-fallback .phone-fallback {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .hero-media.is-fallback .phone-video {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 28px;
+    border: 8px solid #1b1b20;
+    background: #000;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+  }
+
   @media (max-width: 860px) {
     .hero-inner {
       grid-template-columns: 1fr;
+      gap: 1.5rem;
     }
     .hero-media {
       order: -1;
+      max-width: 340px;
     }
-    .phone {
-      max-width: 260px;
+  }
+  @media (max-width: 640px) {
+    .hero {
+      padding-top: 3rem;
     }
   }
 </style>

@@ -4,6 +4,10 @@ export const site = {
   description:
     'VibeStudio IDE is a native Android app that puts a full, AI-driven development environment on your phone. No cloud build box, no account, nothing phones home.',
   url: 'https://vibestudio-ide.dev',
+  author: {
+    name: 'Dmitrij Rysanow',
+    url: 'https://dmitrijrysanow.pro',
+  },
   github: {
     owner: 'thecyberd3m0n',
     repo: 'VibeStudioIDE',
