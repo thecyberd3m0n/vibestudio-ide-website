@@ -1,5 +1,5 @@
 ---
-import { site, fdroidUrl, releasesUrl } from '../config';
+import { site, fdroidUrl, releasesUrl, withBase } from '../config';
 import { formatSize, formatDate } from '../lib/releases';
 import type { Release } from '../lib/releases';
 
@@ -19,7 +19,7 @@ const apk = latest?.assets[0];
       <h2>Download VibeStudio</h2>
       <p>
         Free and open source. Requires {site.minAndroid} on an {site.arch} device.
-        {compact && <> <a href="/downloads">See all releases →</a></>}
+        {compact && <> <a href={withBase('/downloads')}>See all releases →</a></>}
       </p>
     </div>
 
@@ -95,7 +95,7 @@ const apk = latest?.assets[0];
         <p class="muted">
           Build the APK yourself — even from inside Termux on your phone. No Android Studio required.
         </p>
-        <a href="/#build" class="btn btn-ghost">Build instructions</a>
+        <a href={withBase('/#build')} class="btn btn-ghost">Build instructions</a>
       </article>
     </div>
   </div>

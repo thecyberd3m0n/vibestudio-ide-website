@@ -30,6 +30,9 @@ jobs:
       - run: npm run build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Switch to the custom domain once DNS is live:
+          # SITE_URL: https://vibestudio-ide.dev
+          # BASE_PATH: /
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

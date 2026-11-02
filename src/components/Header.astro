@@ -1,19 +1,19 @@
 ---
-import { site, repoUrl } from '../config';
+import { site, repoUrl, withBase } from '../config';
 
 const links = [
-  { href: '/#features', label: 'Features' },
-  { href: '/#principles', label: 'Principles' },
-  { href: '/downloads', label: 'Downloads' },
-  { href: '/#build', label: 'Build' },
+  { href: withBase('/#features'), label: 'Features' },
+  { href: withBase('/#principles'), label: 'Principles' },
+  { href: withBase('/downloads'), label: 'Downloads' },
+  { href: withBase('/#build'), label: 'Build' },
 ];
 ---
 
 <header class="header">
   <div class="container header-inner">
-    <a href="/" class="brand" aria-label={`${site.name} home`}>
+    <a href={withBase('/')} class="brand" aria-label={`${site.name} home`}>
       <img
-        src="/images/logo-lockup.png"
+        src={withBase('/images/logo-lockup.png')}
         alt={`${site.name} — Mobile-first agentic IDE`}
         width="487"
         height="96"

@@ -24,7 +24,10 @@ unavailable the pages fall back to linking the GitHub releases page.
 
 Edit [`src/config.ts`](src/config.ts) to change the repository, package id,
 site URL or to flip `fdroidPublished` once the app lands in the F-Droid
-catalogue. Update `site` in `astro.config.mjs` to the deployed domain.
+catalogue. The deploy target is controlled by `SITE_URL` and `BASE_PATH` (see
+`astro.config.mjs`); they default to the GitHub Pages project URL. Set them
+in `.github/workflows/deploy.yml` (and restore `public/CNAME`) once the
+custom domain is live.
 
 ## Hero phone scene
 
