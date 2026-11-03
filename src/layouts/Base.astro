@@ -32,6 +32,15 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url);
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={new URL(withBase('/images/og.jpg'), canonical)} />
     <meta name="twitter:card" content="summary_large_image" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LCMCRQYXJQ"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-LCMCRQYXJQ');
+    </script>
   </head>
   <body>
     <Header />
