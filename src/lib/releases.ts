@@ -1,5 +1,9 @@
-import { marked } from 'marked';
 import { site, releasesUrl } from '../config';
+
+/**
+ * Release model shared by the build-time pre-render and the client-side refresh.
+ * Keep this module free of Node-only APIs so it can be bundled for the browser.
+ */
 
 export interface ReleaseAsset {
   name: string;
@@ -13,20 +17,20 @@ export interface Release {
   name: string;
   url: string;
   publishedAt: string;
-  /** Release notes rendered from Markdown to HTML. */
-  bodyHtml: string;
+  /** Release notes as GitHub-flavoured Markdown. */
+  notes: string;
   prerelease: boolean;
   assets: ReleaseAsset[];
 }
 
-interface GitHubAsset {
+export interface GitHubAsset {
   name: string;
   browser_download_url: string;
   size: number;
   download_count: number;
 }
 
-interface GitHubRelease {
+export interface GitHubRelease {
   tag_name: string;
   name: string | null;
   html_url: string;
@@ -37,58 +41,34 @@ interface GitHubRelease {
   assets: GitHubAsset[];
 }
 
-const API = `https://api.github.com/repos/${site.github.owner}/${site.github.repo}/releases?per_page=20`;
+export const RELEASES_API = `https://api.github.com/repos/${site.github.owner}/${site.github.repo}/releases?per_page=20`;
 
-let cache: Release[] | null = null;
+export const GITHUB_ACCEPT = 'application/vnd.github+json';
 
-/**
- * Fetches releases from GitHub at build time. Returns an empty list when the
- * API is unreachable or rate-limited so the build never fails on network issues.
- */
-export async function getReleases(): Promise<Release[]> {
-  if (cache) return cache;
-
-  const headers: Record<string, string> = {
-    Accept: 'application/vnd.github+json',
-    'User-Agent': 'vibestudio-ide-website',
-  };
-  if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
-
-  try {
-    const res = await fetch(API, { headers });
-    if (!res.ok) {
-      console.warn(`[releases] GitHub API returned ${res.status}; download list will be empty.`);
-      cache = [];
-      return cache;
-    }
-    const data = (await res.json()) as GitHubRelease[];
-    cache = data
-      .filter((r) => !r.draft)
-      .map((r) => ({
-        tag: r.tag_name,
-        name: r.name || r.tag_name,
-        url: r.html_url,
-        publishedAt: r.published_at,
-        bodyHtml: r.body ? (marked.parse(r.body, { async: false }) as string) : '',
-        prerelease: r.prerelease,
-        assets: r.assets
-          .filter((a) => a.name.endsWith('.apk'))
-          .map((a) => ({
-            name: a.name,
-            url: a.browser_download_url,
-            size: a.size,
-            downloads: a.download_count,
-          })),
-      }));
-  } catch (err) {
-    console.warn(`[releases] Failed to reach GitHub API: ${(err as Error).message}`);
-    cache = [];
-  }
-  return cache;
+/** Converts the raw GitHub API payload into the site's release model (drafts and non-APK assets dropped). */
+export function normalizeReleases(data: GitHubRelease[]): Release[] {
+  return data
+    .filter((r) => !r.draft)
+    .map((r) => ({
+      tag: r.tag_name,
+      name: r.name || r.tag_name,
+      url: r.html_url,
+      publishedAt: r.published_at,
+      notes: r.body ?? '',
+      prerelease: r.prerelease,
+      assets: r.assets
+        .filter((a) => a.name.endsWith('.apk'))
+        .map((a) => ({
+          name: a.name,
+          url: a.browser_download_url,
+          size: a.size,
+          downloads: a.download_count,
+        })),
+    }));
 }
 
-export async function getLatestRelease(): Promise<Release | null> {
-  const releases = await getReleases();
+/** The newest stable release that ships an APK, falling back to the newest release of any kind. */
+export function pickLatest(releases: Release[]): Release | null {
   return releases.find((r) => !r.prerelease && r.assets.length > 0) ?? releases[0] ?? null;
 }
 

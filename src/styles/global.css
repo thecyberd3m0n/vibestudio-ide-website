@@ -21,6 +21,11 @@
   box-sizing: border-box;
 }
 
+/* Keep `hidden` authoritative even for elements that set their own display. */
+[hidden] {
+  display: none !important;
+}
+
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 80px;

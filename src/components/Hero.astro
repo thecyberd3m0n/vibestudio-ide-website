@@ -12,7 +12,7 @@ const apk = latest?.assets[0];
 <section class="hero">
   <div class="container hero-inner">
     <div class="hero-copy">
-      <span class="badge badge-purple">Early access · {latest ? latest.tag : 'v0.1.x'}</span>
+      <span class="badge badge-purple">Early access · <span data-release="tag">{latest ? latest.tag : 'v0.1.x'}</span></span>
       <h1>
         A full IDE on your phone.<br />
         <span class="accent">Nothing leaves the device.</span>
@@ -22,7 +22,7 @@ const apk = latest?.assets[0];
         browser with MCP tooling — running entirely on-device. Think <em>VS Code, but mobile</em>.
       </p>
       <div class="cta">
-        <a href={apk ? apk.url : '/downloads'} class="btn btn-primary">
+        <a href={apk ? apk.url : withBase('/downloads')} class="btn btn-primary" data-release="apk-url">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
           </svg>
@@ -54,7 +54,10 @@ const apk = latest?.assets[0];
 </section>
 
 <script>
+  import { hydrateLatest } from '../scripts/releases-client';
   import { createPhoneScene } from '../scripts/phone-scene';
+
+  hydrateLatest();
 
   const stage = document.querySelector<HTMLElement>('[data-phone-stage]');
   const canvas = stage?.querySelector<HTMLCanvasElement>('.phone-canvas');

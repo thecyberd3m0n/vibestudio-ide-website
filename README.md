@@ -16,9 +16,13 @@ npm run build      # output in ./dist
 npm run preview
 ```
 
-Release downloads are fetched from the GitHub Releases API at build time. Set
-`GITHUB_TOKEN` in the environment to avoid rate limits in CI; when the API is
-unavailable the pages fall back to linking the GitHub releases page.
+Release downloads are loaded client-side from the GitHub Releases API
+(`src/scripts/releases-client.ts`), so a new app release shows up on the live
+site without a redeploy. The pages are also pre-rendered with a build-time
+snapshot of the same data as a fallback for crawlers, no-JS visitors and API
+outages; set `GITHUB_TOKEN` in the environment to avoid rate limits for that
+snapshot in CI. If neither source is available, the pages link to the GitHub
+releases page.
 
 ## Configuration
 

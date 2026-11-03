@@ -3,9 +3,6 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
-  # Rebuild nightly so the downloads page picks up new app releases.
-  schedule:
-    - cron: '0 3 * * *'
   workflow_dispatch:
 
 permissions:

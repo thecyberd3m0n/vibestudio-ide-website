@@ -1,7 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
 import Download from '../components/Download.astro';
-import { getReleases, getLatestRelease, formatSize, formatDate } from '../lib/releases';
+import { getReleases, getLatestRelease } from '../lib/releases-build';
+import { formatSize, formatDate } from '../lib/releases';
+import { renderMarkdown } from '../lib/markdown';
 import { releasesUrl } from '../config';
 
 const releases = await getReleases();
@@ -22,44 +24,75 @@ const older = releases.filter((r) => r.tag !== latest?.tag);
         </p>
       </div>
 
-      {
-        older.length === 0 ? (
-          <p class="muted">
-            {releases.length === 0
-              ? 'Release information could not be loaded at build time. Please use the GitHub releases page.'
-              : 'No earlier releases yet.'}
-          </p>
-        ) : (
-          <ul class="releases">
-            {older.map((r) => (
-              <li class="card release">
-                <div class="release-head">
-                  <h3>
-                    <a href={r.url} target="_blank" rel="noopener">
-                      {r.tag}
-                    </a>
-                    {r.prerelease && <span class="badge badge-muted">pre-release</span>}
-                  </h3>
-                  <time class="muted" datetime={r.publishedAt}>
-                    {formatDate(r.publishedAt)}
-                  </time>
-                </div>
-                {r.bodyHtml && <div class="muted notes" set:html={r.bodyHtml} />}
-                <div class="assets">
-                  {r.assets.map((a) => (
-                    <a href={a.url} class="btn btn-ghost">
-                      {a.name} <span class="muted">· {formatSize(a.size)}</span>
-                    </a>
-                  ))}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )
-      }
+      <p class="muted" data-release="history-empty" hidden={older.length > 0}>
+        {releases.length === 0
+          ? 'Release information could not be loaded. Please use the GitHub releases page.'
+          : 'No earlier releases yet.'}
+      </p>
+      <ul class="releases" data-release="history" hidden={older.length === 0}>
+        {older.map((r) => {
+          const notesHtml = renderMarkdown(r.notes);
+          return (
+            <li class="card release">
+              <div class="release-head">
+                <h3>
+                  <a href={r.url} target="_blank" rel="noopener">
+                    {r.tag}
+                  </a>
+                  {r.prerelease && <span class="badge badge-muted">pre-release</span>}
+                </h3>
+                <time class="muted" datetime={r.publishedAt}>
+                  {formatDate(r.publishedAt)}
+                </time>
+              </div>
+              {notesHtml && <div class="muted notes" set:html={notesHtml} />}
+              <div class="assets">
+                {r.assets.map((a) => (
+                  <a href={a.url} class="btn btn-ghost">
+                    {a.name} <span class="muted">· {formatSize(a.size)}</span>
+                  </a>
+                ))}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+
+      <!-- Markup cloned by the client script when it re-renders the list with fresh data. -->
+      <template data-release="history-item">
+        <li class="card release">
+          <div class="release-head">
+            <h3>
+              <a data-field="link" target="_blank" rel="noopener"></a>
+              <span class="badge badge-muted" data-field="prerelease" hidden>pre-release</span>
+            </h3>
+            <time class="muted" data-field="date"></time>
+          </div>
+          <div class="muted notes" data-field="notes" hidden></div>
+          <div class="assets" data-field="assets"></div>
+        </li>
+      </template>
+      <template data-release="history-asset">
+        <a class="btn btn-ghost"><span data-field="name"></span> <span class="muted" data-field="size"></span></a>
+      </template>
     </div>
   </section>
 </Base>
+
+<script>
+  import { loadReleases, applyLatestNotes, applyHistory } from '../scripts/releases-client';
+  import { pickLatest } from '../lib/releases';
+  import { renderMarkdown } from '../lib/markdown';
+
+  // The latest-release card is refreshed by the Download component; this page
+  // additionally owns the release notes and the previous-releases list.
+  loadReleases().then((releases) => {
+    if (!releases) return;
+    const latest = pickLatest(releases);
+    applyLatestNotes(latest, renderMarkdown);
+    applyHistory(releases, latest, renderMarkdown);
+  });
+</script>
 
 <style>
   .history {
@@ -104,6 +137,9 @@ const older = releases.filter((r) => r.tag !== latest?.tag);
   }
   .notes :global(p) {
     margin: 0.25rem 0;
+  }
+  .notes :global(code) {
+    overflow-wrap: anywhere;
   }
   .assets {
     display: flex;

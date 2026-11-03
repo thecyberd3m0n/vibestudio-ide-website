@@ -2,6 +2,7 @@
 import { site, fdroidUrl, releasesUrl, withBase } from '../config';
 import { formatSize, formatDate } from '../lib/releases';
 import type { Release } from '../lib/releases';
+import { renderMarkdown } from '../lib/markdown';
 
 interface Props {
   latest: Release | null;
@@ -10,6 +11,7 @@ interface Props {
 }
 const { latest, compact = false } = Astro.props;
 const apk = latest?.assets[0];
+const notesHtml = latest && !compact ? renderMarkdown(latest.notes) : '';
 ---
 
 <section id="download" class="section">
@@ -31,29 +33,25 @@ const apk = latest?.assets[0];
           </svg>
           <h3>Direct APK</h3>
         </div>
-        {
-          apk && latest ? (
-            <>
-              <p class="muted">
-                <strong class="ver">{latest.tag}</strong> · {formatSize(apk.size)} · released {formatDate(latest.publishedAt)}
-              </p>
-              {latest.bodyHtml && !compact && <div class="notes" set:html={latest.bodyHtml} />}
-              <a href={apk.url} class="btn btn-primary">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
-                </svg>
-                Download {apk.name}
-              </a>
-            </>
-          ) : (
-            <>
-              <p class="muted">Grab the latest signed APK from the GitHub releases page.</p>
-              <a href={releasesUrl} class="btn btn-primary" target="_blank" rel="noopener">
-                Open GitHub releases
-              </a>
-            </>
-          )
-        }
+        <!-- Both states are rendered; the client script toggles them once fresh release data arrives. -->
+        <div class="release-info" data-release="available" hidden={!(apk && latest)}>
+          <p class="muted">
+            <strong class="ver" data-release="tag">{latest?.tag}</strong> · <span data-release="size">{apk && formatSize(apk.size)}</span> · released <time data-release="date" datetime={latest?.publishedAt}>{latest && formatDate(latest.publishedAt)}</time>
+          </p>
+          {!compact && <div class="notes" data-release="notes" set:html={notesHtml} hidden={!notesHtml} />}
+          <a href={apk?.url} class="btn btn-primary" data-release="apk-url">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+            </svg>
+            Download <span data-release="apk-name">{apk?.name}</span>
+          </a>
+        </div>
+        <div class="release-info" data-release="unavailable" hidden={Boolean(apk && latest)}>
+          <p class="muted">Grab the latest signed APK from the GitHub releases page.</p>
+          <a href={releasesUrl} class="btn btn-primary" target="_blank" rel="noopener">
+            Open GitHub releases
+          </a>
+        </div>
         <p class="hint muted">
           Signed with the project debug key during early access — you'll need to allow installs from unknown
           sources.
@@ -101,13 +99,20 @@ const apk = latest?.assets[0];
   </div>
 </section>
 
+<script>
+  import { hydrateLatest } from '../scripts/releases-client';
+
+  hydrateLatest();
+</script>
+
 <style>
   .options {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.25rem;
   }
-  .option {
+  .option,
+  .release-info {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
@@ -140,6 +145,23 @@ const apk = latest?.assets[0];
   }
   .notes {
     font-size: 0.95rem;
+  }
+  .notes :global(h1),
+  .notes :global(h2),
+  .notes :global(h3) {
+    font-size: 1rem;
+    color: var(--text);
+    margin: 0.75rem 0 0.25rem;
+  }
+  .notes :global(ul) {
+    padding-left: 1.25rem;
+    margin: 0.25rem 0;
+  }
+  .notes :global(p) {
+    margin: 0.25rem 0;
+  }
+  .notes :global(code) {
+    overflow-wrap: anywhere;
   }
   .hint {
     font-size: 0.82rem;
